@@ -4,7 +4,7 @@ import struct
 
 class Image:
     def __init__(self):
-        self.data = []
+        self.data = [[]]
 
 class ImageFile:
     def __init__(self, path):
@@ -14,7 +14,24 @@ class ImageFile:
             self.image_count = header[1]
             self.rows_per_image = header[2]
             self.cols_per_image = header[3]
-        self.imagse = []
+            self.images = []
+
+            for img in range(self.image_count):
+                img = []
+                for row in range(self.rows_per_image):
+                    row = []
+                    for col in range(self.cols_per_image):
+                        row.append(f.read(1))
+                    img.append(row)
+                self.images.append(img)
+
+class LabelFile:
+    def __init__(self, path):
+        with open(path, 'rb') as f:
+            header = struct.unpack(">ii", f.read(8))
+            self.magic = header[0]
+            self.label_count = header[1]
+            self.labels = f.read()
 
 def main():
     1
