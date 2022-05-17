@@ -40,7 +40,7 @@ class NeuralNetwork:
         # function
         return x * (1 - x)
 
-    def fit(self, X, y, epochs=1000, displayUpdate=100):
+    def fit(self, X, y, epochs=1000, displayUpdate=5):
         # insert a column of 1's as the last entry in the feature
         # matrix -- this little trick allows us to treat the bias
         # as a trainable parameter within the weight matrix
