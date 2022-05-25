@@ -1,11 +1,53 @@
 #!/usr/bin/env python
 
+from asyncio.windows_events import NULL
 from ImageFile import ImageFile
 from LabelFile import LabelFile
 from neuralnetwork import NeuralNetwork
 import numpy as np
+import pickle
 
 from sklearn.metrics import classification_report
+
+def displayWrong(indexArray, images, labels, prediction):
+    maxDisplays = 50
+    for index in indexArray:
+        numberImage = images.imagesOneDim[index]
+        print("Displaying inncorect prediction!!\n Predicted {} while the value is {}".format(prediction[index], labels[index]))
+        i = 0
+        for x in range(1,29):
+            toDisplay = ""
+            for y in range(1,29):
+                toDisplay += str(numberImage[i])
+                i+=1
+            print(toDisplay)
+        print("\n\n\n")
+        maxDisplays-=1
+        if maxDisplays<=0:
+            break
+
+
+def displayWrongPredictions(prediction, labels, images):
+    i = 0
+    wrongIndexArray = []
+    for pred in prediction:
+        if pred != labels[i]:
+            wrongIndexArray.append(i)
+        i+=1
+    displayWrong(wrongIndexArray, images, labels, prediction)
+
+
+def saveClass(networkClass, name):
+    with open(f'' + "{}".format(name), 'wb') as file:
+        pickle.dump(networkClass, file)
+
+def loadeClass(name):
+    with open(f''+ "{}".format(name), 'rb') as file2:
+        s1_new = pickle.load(file2)
+    if s1_new == NULL:
+        print("Network load failed")
+        return NULL
+    return s1_new
 
 def runProgram():
     print("loading training data ")
@@ -38,15 +80,23 @@ def runProgram():
     print("creating network ")
 #    imageNetwork = NeuralNetwork([784, 392, 196, 48, 24, 10], alpha=0.2)
 #    imageNetwork = NeuralNetwork([xdI.shape[1], 392, 196, 10], alpha=0.2)
-    imageNetwork = NeuralNetwork([xdI.shape[1], 196, 10], alpha=0.2)
-    print("[INFO] {}".format(imageNetwork))
 
-    print("network training started")
-    imageNetwork.fit(xdI, xdL, epochs=100)
-    print("network training ended")
+
+# commentef for file saving testing
+#    imageNetwork = NeuralNetwork([xdI.shape[1], 10], alpha=0.1)
+#    print("[INFO] {}".format(imageNetwork))
+
+#    print("network training started")
+#    imageNetwork.fit(xdI, xdL, epochs=1)
+#    print("network training ended")
+ 
+    imageNetwork = loadeClass('test.pickle')
+#    saveClass(imageNetwork, 'test.pickle')
+
 
     predictions = imageNetwork.predict(xdITestowe)
     predictions = predictions.argmax(axis=1)
+    displayWrongPredictions(predictions, testLabel.test, testImages)
     print(classification_report(xdLTestowe.argmax(axis=1), predictions))
 
 
@@ -58,6 +108,8 @@ def main():
     print("test")
     test()
     runProgram()
+
+    fileName = 'test.pickle'
 
  
     #region xor network usage example
