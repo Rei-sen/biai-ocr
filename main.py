@@ -10,7 +10,6 @@ import pickle
 from sklearn.metrics import classification_report
 
 def displayWrong(indexArray, images, labels, prediction):
-    maxDisplays = 50
     for index in indexArray:
         numberImage = images.imagesOneDim[index]
         print("Displaying inncorect prediction!!\n Predicted {} while the value is {}".format(prediction[index], labels[index]))
@@ -22,19 +21,20 @@ def displayWrong(indexArray, images, labels, prediction):
                 i+=1
             print(toDisplay)
         print("\n\n\n")
-        maxDisplays-=1
-        if maxDisplays<=0:
-            break
 
 
-def displayWrongPredictions(prediction, labels, images):
+def displayWrongPredictions(prediction, labels, images, labelsCount):
     i = 0
+    xd = 0
     wrongIndexArray = []
     for pred in prediction:
         if pred != labels[i]:
             wrongIndexArray.append(i)
+            xd+=1
         i+=1
     displayWrong(wrongIndexArray, images, labels, prediction)
+    
+    print("Good count  bad count {}".format(xd))
 
 
 def saveClass(networkClass, name):
@@ -49,14 +49,38 @@ def loadeClass(name):
         return NULL
     return s1_new
 
+
+def testNetwork(imagesFile, labelsFile, networkFile, displayWrong):
+    print("loading testing data ")
+    testLabel = LabelFile('./data/t10k-labels-idx1-ubyte') 
+    testImages = ImageFile('./data/t10k-images-idx3-ubyte')
+    print("loading end ")
+    print("loaded testing images {}".format(testLabel.label_count))    
+
+    print("array convertion")
+    testoweImagesConvert = np.array(testImages.imagesOneDim)
+    testoweLabelsgesConvert = np.array(testLabel.testV2)
+    print("array ended")
+    imageNetwork = loadeClass('test.pickle')
+    predictions = imageNetwork.predict(testoweImagesConvert)
+    predictions = predictions.argmax(axis=1)
+    
+    if displayWrong == True:
+        displayWrongPredictions(predictions, testLabel.test, testImages, testLabel.test.count)
+    
+    print(classification_report(testoweLabelsgesConvert.argmax(axis=1), predictions))
+
+
 def runProgram():
     print("loading training data ")
 
     # na czas testowania dałem dane do walidacje jako dane na podstawi których sieć się uczy
     trainLabel = LabelFile('./data/train-labels-idx1-ubyte') 
     trainImages = ImageFile('./data/train-images-idx3-ubyte')
-    #trainLabel = LabelFile('./data/t10k-labels-idx1-ubyte') 
-    #trainImages = ImageFile('./data/t10k-images-idx3-ubyte')
+    
+    # prawidłowe dane do walidacji
+#    trainLabel = LabelFile('./data/t10k-labels-idx1-ubyte') 
+#    trainImages = ImageFile('./data/t10k-images-idx3-ubyte')
 
     print("loading end ")
     print("loaded training images {}".format(trainLabel.label_count))
@@ -71,32 +95,40 @@ def runProgram():
 
     print("array convertion")
     xdI = np.array(trainImages.imagesOneDim)
+    # get only XX of images
+ #   xdI = xdII[:len(xdII)//2]
     xdITestowe = np.array(testImages.imagesOneDim)
 
+
     xdL = np.array(trainLabel.testV2)
+     # get only XX of images
+#    xdL = xdLL[:len(xdLL)//2]
     xdLTestowe = np.array(testLabel.testV2)
+
+
     print("array ended")
 
     print("creating network ")
 #    imageNetwork = NeuralNetwork([784, 392, 196, 48, 24, 10], alpha=0.2)
-#    imageNetwork = NeuralNetwork([xdI.shape[1], 392, 196, 10], alpha=0.2)
+    imageNetwork = NeuralNetwork([xdI.shape[1], 392, 196, 49, 10], alpha=0.05)
 
 
 # commentef for file saving testing
-#    imageNetwork = NeuralNetwork([xdI.shape[1], 10], alpha=0.1)
+#    imageNetwork = NeuralNetwork([xdI.shape[1],392,100, 50, 10], alpha=0.05)
 #    print("[INFO] {}".format(imageNetwork))
 
-#    print("network training started")
-#    imageNetwork.fit(xdI, xdL, epochs=1)
-#    print("network training ended")
+    print("network training started")
+    imageNetwork.fit(xdI, xdL, epochs=200)
+    print("network training ended")
  
-    imageNetwork = loadeClass('test.pickle')
-#    saveClass(imageNetwork, 'test.pickle')
+#    imageNetwork = loadeClass('test.pickle')
+    saveClass(imageNetwork, 'test.pickle')
 
 
     predictions = imageNetwork.predict(xdITestowe)
     predictions = predictions.argmax(axis=1)
-    displayWrongPredictions(predictions, testLabel.test, testImages)
+    
+#    displayWrongPredictions(predictions, testLabel.test, testImages, testLabel.test.count)
     print(classification_report(xdLTestowe.argmax(axis=1), predictions))
 
 
@@ -107,27 +139,10 @@ def main():
     1
     print("test")
     test()
-    runProgram()
-
+ #   runProgram()
+    testNetwork("","","",True)
     fileName = 'test.pickle'
 
- 
-    #region xor network usage example
-    """
-    X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    y = np.array([[0], [1], [1], [0]])
-
-    xOrTest = NeuralNetwork([2, 2, 1], alpha=0.5)
-    xOrTest.fit(X, y, epochs=2000)
-    for (x, target) in zip(X, y):
-        # make a prediction on the data point and display the result
-        # to our console
-        pred = xOrTest.predict(x)[0][0]
-        step = 1 if pred > 0.5 else 0
-        print("[INFO] data={}, ground-truth={}, pred={:.4f}, step={}".format(
-            x, target[0], pred, step))
-    """
-    #endregion
 
 
 
