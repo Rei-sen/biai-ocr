@@ -12,7 +12,7 @@ from sklearn.metrics import classification_report
 def displayWrong(indexArray, images, labels, prediction):
     for index in indexArray:
         numberImage = images.imagesOneDim[index]
-        print("Displaying inncorect prediction!!\n Predicted {} while the value is {}".format(prediction[index], labels[index]))
+        print("Displaying inncorect prediction!!\nPredicted {} while the value is {}".format(prediction[index], labels[index]))
         i = 0
         for x in range(1,29):
             toDisplay = ""
@@ -33,7 +33,6 @@ def displayWrongPredictions(prediction, labels, images, labelsCount):
             xd+=1
         i+=1
     displayWrong(wrongIndexArray, images, labels, prediction)
-    
     print("Good count  bad count {}".format(xd))
 
 
@@ -48,6 +47,24 @@ def loadeClass(name):
         print("Network load failed")
         return NULL
     return s1_new
+
+
+def trainAndSaveNetwork(imagesFile, labelsFile):
+    print("loading training data ")
+    trainLabel = LabelFile('./data/train-labels-idx1-ubyte') 
+    trainImages = ImageFile('./data/train-images-idx3-ubyte')
+    print("loading end ")
+    print("array convertion")
+    convertImages = np.array(trainImages.imagesOneDim)
+    convertLabels = np.array(trainLabel.testV2)
+    print("array ended")    
+
+    print("creating network ")
+    imageNetwork = NeuralNetwork([convertImages.shape[1], 392, 196, 49, 10], alpha=0.05)
+    print("network training started")
+    imageNetwork.fit(convertImages, convertLabels, epochs=200)
+    print("network training ended")
+    saveClass(imageNetwork, 'test.pickle')
 
 
 def testNetwork(imagesFile, labelsFile, networkFile, displayWrong):
@@ -136,12 +153,10 @@ def test():
     return LabelFile('./data/t10k-labels-idx1-ubyte')
 
 def main():
-    1
-    print("test")
-    test()
+    
+#    fileName = 'test.pickle'
  #   runProgram()
     testNetwork("","","",True)
-    fileName = 'test.pickle'
 
 
 
