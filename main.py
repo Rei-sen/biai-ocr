@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from asyncio.windows_events import NULL
 from ImageFile import ImageFile
 from LabelFile import LabelFile
 from neuralnetwork import NeuralNetwork
@@ -45,9 +44,9 @@ def saveClass(networkClass, name):
 def loadeClass(name):
     with open(f''+ "{}".format(name), 'rb') as file2:
         s1_new = pickle.load(file2)
-    if s1_new == NULL:
-        print("Network load failed")
-        return NULL
+    # if s1_new == NULL:
+    #     print("Network load failed")
+    #     return NULL
     return s1_new
 
 
@@ -58,7 +57,7 @@ def trainAndSaveNetwork(imagesFile, labelsFile):
     print("loading end ")
     print("array convertion")
     convertImages = np.array(trainImages.imagesOneDim)
-    convertLabels = np.array(trainLabel.testV2)
+    convertLabels = np.array(trainLabel.labelValueArray)
     print("array ended")    
 
     print("creating network ")
@@ -78,14 +77,14 @@ def testNetwork(imagesFile, labelsFile, networkFile, displayWrong):
 
     print("array convertion")
     testoweImagesConvert = np.array(testImages.imagesOneDim)
-    testoweLabelsgesConvert = np.array(testLabel.testV2)
+    testoweLabelsgesConvert = np.array(testLabel.labelValueArray)
     print("array ended")
     imageNetwork = loadeClass('test.pickle')
     predictions = imageNetwork.predict(testoweImagesConvert)
     predictions = predictions.argmax(axis=1)
     
     if displayWrong == True:
-        displayWrongPredictions(predictions, testLabel.test, testImages, testLabel.test.count)
+        displayWrongPredictions(predictions, testLabel.labelValue, testImages, testLabel.labelValue.count)
     
     print(classification_report(testoweLabelsgesConvert.argmax(axis=1), predictions))
 
@@ -119,10 +118,10 @@ def runProgram():
     xdITestowe = np.array(testImages.imagesOneDim)
 
 
-    xdL = np.array(trainLabel.testV2)
+    xdL = np.array(trainLabel.labelValueArray)
      # get only XX of images
 #    xdL = xdLL[:len(xdLL)//2]
-    xdLTestowe = np.array(testLabel.testV2)
+    xdLTestowe = np.array(testLabel.labelValueArray)
 
 
     print("array ended")
