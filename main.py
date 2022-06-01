@@ -4,8 +4,10 @@ from asyncio.windows_events import NULL
 from ImageFile import ImageFile
 from LabelFile import LabelFile
 from neuralnetwork import NeuralNetwork
+from PGMImage import PGMImage
 import numpy as np
 import pickle
+import sys
 
 from sklearn.metrics import classification_report
 
@@ -152,13 +154,37 @@ def runProgram():
 def test():
     return LabelFile('./data/t10k-labels-idx1-ubyte')
 
+def usage():
+    print(sys.argv[0] + ' train/read')
+
+def train():
+    if (len(sys.argv) <= 5):
+        print('usage:\n' + sys.argv[0] + 'train image-path label-path output-path')
+    else:
+        img = ImageFile(sys.argv[2])
+        labels = LabelFile(sys.argv[3])
+
+def read():
+    if (len(sys.argv) <= 5):
+        print('usage:\n' + sys.argv[0] + 'read network-path image-path')
+    else:
+        img = PGMImage(sys.argv[3])
+
 def main():
-    
+
 #    fileName = 'test.pickle'
  #   runProgram()
     testNetwork("","","",True)
 
-
+    args = sys.argv
+    if (len(args) >= 2):
+        if (args[1] == 'train'):
+            train()
+        elif (args[1] == 'read'):
+            read()
+    else:
+        print("usage:")
+        usage()
 
 
 
