@@ -154,29 +154,28 @@ def test():
     return LabelFile('./data/t10k-labels-idx1-ubyte')
 
 def usage():
-    print(sys.argv[0] + ' train/read')
+    print(sys.argv[0] + ' train/read/test')
 
 def train():
     if (len(sys.argv) < 6):
-        print('usage:\n' + sys.argv[0] + 'train image-path label-path epochs-count output-path')
+        print('usage:\n' + sys.argv[0] + ' train image-path label-path epochs-count output-path')
         return
     img = ImageFile(sys.argv[2])
     labels = LabelFile(sys.argv[3])
     epochsCount = int(sys.argv[4]) # sprawdzenie błędów trzeba dodać
     outputFile = sys.argv[5]
 
-    convertImages = np.array(img.imagesOneDim)
-    convertLabels = np.array(labels.labelValueArray)
+    imgArray = np.array(img.imagesOneDim)
+    labelArray = np.array(labels.labelValueArray)
 
-    imageNetwork = NeuralNetwork([convertImages.shape[1], 392, 196, 49, 10], alpha=0.05)
-    imageNetwork.fit(convertImages, convertLabels, epochs=epochsCount)
+    imageNetwork = NeuralNetwork([imgArray.shape[1], 392, 196, 49, 10], alpha=0.05)
+    imageNetwork.fit(imgArray, labelArray, epochs=epochsCount)
     saveClass(imageNetwork, outputFile)
-
 
 
 def read():
     if (len(sys.argv) < 4):
-        print('usage:\n' + sys.argv[0] + 'read network-path image-path')
+        print('usage:\n' + sys.argv[0] + ' read network-path image-path')
         return
     networkPath = sys.argv[2]
     img = PGMImage(sys.argv[3])
@@ -184,6 +183,20 @@ def read():
     network = loadClass(networkPath)
     print(network.predict([img.data]).argmax(axis=1)[0])
 
+def test():
+    if (len(sys.argv) < 4):
+        print('usage:\n' + sys.argv[0] + ' test network-path image-path label-path')
+        return
+
+    networkPath = sys.argv[2]
+    img = ImageFile(sys.argv[3])
+    labels = LabelFile(sys.argv[4])
+
+    network = loadClass(networkPath)
+    predictions = network.predict(img.imagesOneDim)
+    predictions = predictions.argmax(axis=1)
+
+    print(classification_report(labels.labelValue , predictions))
 
 def main():
 
@@ -197,6 +210,8 @@ def main():
             train()
         elif (args[1] == 'read'):
             read()
+        elif (args[1] == 'test'):
+            test()
     else:
         print("usage:")
         usage()

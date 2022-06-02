@@ -14,13 +14,9 @@ class ImageFile:
             self.rows_per_image = header[2]
             self.cols_per_image = header[3]
             self.imagesOneDim = []
-            i = 0
             for img in range(self.image_count):
                 whole = []
                 for row in range(self.rows_per_image):
                     for col in range(self.cols_per_image):
                         whole.append(int.from_bytes(f.read(1), "big") / 255.0)
-                if i == 0:
-                    print("size of picture {}".format(len(whole)))
-                i+=1
                 self.imagesOneDim.append(whole)
