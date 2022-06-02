@@ -41,7 +41,7 @@ def saveClass(networkClass, name):
     with open(f'' + "{}".format(name), 'wb') as file:
         pickle.dump(networkClass, file)
 
-def loadeClass(name):
+def loadClass(name):
     with open(f''+ "{}".format(name), 'rb') as file2:
         s1_new = pickle.load(file2)
     # if s1_new == NULL:
@@ -79,7 +79,7 @@ def testNetwork(imagesFile, labelsFile, networkFile, displayWrong):
     testoweImagesConvert = np.array(testImages.imagesOneDim)
     testoweLabelsgesConvert = np.array(testLabel.labelValueArray)
     print("array ended")
-    imageNetwork = loadeClass('test.pickle')
+    imageNetwork = loadClass('test.pickle')
     predictions = imageNetwork.predict(testoweImagesConvert)
     predictions = predictions.argmax(axis=1)
     
@@ -139,7 +139,7 @@ def runProgram():
     imageNetwork.fit(xdI, xdL, epochs=200)
     print("network training ended")
  
-#    imageNetwork = loadeClass('test.pickle')
+#    imageNetwork = loadClass('test.pickle')
     saveClass(imageNetwork, 'test.pickle')
 
 
@@ -157,23 +157,39 @@ def usage():
     print(sys.argv[0] + ' train/read')
 
 def train():
-    if (len(sys.argv) <= 5):
-        print('usage:\n' + sys.argv[0] + 'train image-path label-path output-path')
-    else:
-        img = ImageFile(sys.argv[2])
-        labels = LabelFile(sys.argv[3])
+    if (len(sys.argv) < 6):
+        print('usage:\n' + sys.argv[0] + 'train image-path label-path epochs-count output-path')
+        return
+    img = ImageFile(sys.argv[2])
+    labels = LabelFile(sys.argv[3])
+    epochsCount = int(sys.argv[4]) # sprawdzenie błędów trzeba dodać
+    outputFile = sys.argv[5]
+
+    convertImages = np.array(img.imagesOneDim)
+    convertLabels = np.array(labels.labelValueArray)
+
+    imageNetwork = NeuralNetwork([convertImages.shape[1], 392, 196, 49, 10], alpha=0.05)
+    imageNetwork.fit(convertImages, convertLabels, epochs=epochsCount)
+    saveClass(imageNetwork, outputFile)
+
+
 
 def read():
-    if (len(sys.argv) <= 5):
+    if (len(sys.argv) < 4):
         print('usage:\n' + sys.argv[0] + 'read network-path image-path')
-    else:
-        img = PGMImage(sys.argv[3])
+        return
+    networkPath = sys.argv[2]
+    img = PGMImage(sys.argv[3])
+
+    network = loadClass(networkPath)
+    print(network.predict([img.data]))
+
 
 def main():
 
 #    fileName = 'test.pickle'
  #   runProgram()
-    testNetwork("","","",True)
+    #testNetwork("","","",True)
 
     args = sys.argv
     if (len(args) >= 2):

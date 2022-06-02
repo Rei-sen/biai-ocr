@@ -19,10 +19,7 @@ class ImageFile:
                 whole = []
                 for row in range(self.rows_per_image):
                     for col in range(self.cols_per_image):
-                        if f.read(1) != b'\x00':
-                            whole.append(1)
-                        else:
-                            whole.append(0)
+                        whole.append(int.from_bytes(f.read(1), "big") / 255.0)
                 if i == 0:
                     print("size of picture {}".format(len(whole)))
                 i+=1

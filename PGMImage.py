@@ -9,6 +9,7 @@ class PGMImage:
             rawData = f.read()
             data = re.sub(r'#.*\n', r'', rawData).split()
             self.magic = data[0]
-            self.width = data[1]
-            self.height = data[2]
-            self.data = [int(i) for i in data[3:]]
+            self.width = int(data[1])
+            self.height = int(data[2])
+            self.maxValue = int(data[3])
+            self.data = [int(i)/self.maxValue for i in data[4:]]
