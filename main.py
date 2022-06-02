@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-from asyncio.windows_events import NULL
 from ImageFile import ImageFile
 from LabelFile import LabelFile
 from neuralnetwork import NeuralNetwork
+from PGMImage import PGMImage
 import numpy as np
 import pickle
+import sys
 
 from sklearn.metrics import classification_report
 
@@ -43,9 +44,9 @@ def saveClass(networkClass, name):
 def loadeClass(name):
     with open(f''+ "{}".format(name), 'rb') as file2:
         s1_new = pickle.load(file2)
-    if s1_new == NULL:
-        print("Network load failed")
-        return NULL
+    # if s1_new == NULL:
+    #     print("Network load failed")
+    #     return NULL
     return s1_new
 
 
@@ -56,7 +57,7 @@ def trainAndSaveNetwork(imagesFile, labelsFile):
     print("loading end ")
     print("array convertion")
     convertImages = np.array(trainImages.imagesOneDim)
-    convertLabels = np.array(trainLabel.testV2)
+    convertLabels = np.array(trainLabel.labelValueArray)
     print("array ended")    
 
     print("creating network ")
@@ -117,10 +118,10 @@ def runProgram():
     xdITestowe = np.array(testImages.imagesOneDim)
 
 
-    xdL = np.array(trainLabel.testV2)
+    xdL = np.array(trainLabel.labelValueArray)
      # get only XX of images
 #    xdL = xdLL[:len(xdLL)//2]
-    xdLTestowe = np.array(testLabel.testV2)
+    xdLTestowe = np.array(testLabel.labelValueArray)
 
 
     print("array ended")
@@ -152,13 +153,37 @@ def runProgram():
 def test():
     return LabelFile('./data/t10k-labels-idx1-ubyte')
 
+def usage():
+    print(sys.argv[0] + ' train/read')
+
+def train():
+    if (len(sys.argv) <= 5):
+        print('usage:\n' + sys.argv[0] + 'train image-path label-path output-path')
+    else:
+        img = ImageFile(sys.argv[2])
+        labels = LabelFile(sys.argv[3])
+
+def read():
+    if (len(sys.argv) <= 5):
+        print('usage:\n' + sys.argv[0] + 'read network-path image-path')
+    else:
+        img = PGMImage(sys.argv[3])
+
 def main():
-    
+
 #    fileName = 'test.pickle'
  #   runProgram()
     testNetwork("","","",True)
 
-
+    args = sys.argv
+    if (len(args) >= 2):
+        if (args[1] == 'train'):
+            train()
+        elif (args[1] == 'read'):
+            read()
+    else:
+        print("usage:")
+        usage()
 
 
 
