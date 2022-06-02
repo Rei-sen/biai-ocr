@@ -182,7 +182,7 @@ def read():
     img = PGMImage(sys.argv[3])
 
     network = loadClass(networkPath)
-    print(network.predict([img.data]))
+    print(network.predict([img.data]).argmax(axis=1)[0])
 
 
 def main():
