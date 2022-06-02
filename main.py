@@ -76,14 +76,14 @@ def testNetwork(imagesFile, labelsFile, networkFile, displayWrong):
 
     print("array convertion")
     testoweImagesConvert = np.array(testImages.imagesOneDim)
-    testoweLabelsgesConvert = np.array(testLabel.testV2)
+    testoweLabelsgesConvert = np.array(testLabel.labelValueArray)
     print("array ended")
     imageNetwork = loadeClass('test.pickle')
     predictions = imageNetwork.predict(testoweImagesConvert)
     predictions = predictions.argmax(axis=1)
     
     if displayWrong == True:
-        displayWrongPredictions(predictions, testLabel.test, testImages, testLabel.test.count)
+        displayWrongPredictions(predictions, testLabel.labelValue, testImages, testLabel.labelValue.count)
     
     print(classification_report(testoweLabelsgesConvert.argmax(axis=1), predictions))
 
