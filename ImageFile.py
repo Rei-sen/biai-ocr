@@ -3,6 +3,8 @@
 
 import struct
 
+from numpy import imag
+
 class ImageFile:
     def __init__(self, path):
         with open(path, 'rb') as f:
@@ -11,13 +13,10 @@ class ImageFile:
             self.image_count = header[1]
             self.rows_per_image = header[2]
             self.cols_per_image = header[3]
-            self.images = []
-
+            self.imagesOneDim = []
             for img in range(self.image_count):
-                img = []
+                whole = []
                 for row in range(self.rows_per_image):
-                    row = []
                     for col in range(self.cols_per_image):
-                        row.append(f.read(1))
-                    img.append(row)
-                self.images.append(img)
+                        whole.append(int.from_bytes(f.read(1), "big") / 255.0)
+                self.imagesOneDim.append(whole)
