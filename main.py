@@ -149,10 +149,6 @@ def runProgram():
 #    displayWrongPredictions(predictions, testLabel.test, testImages, testLabel.test.count)
     print(classification_report(xdLTestowe.argmax(axis=1), predictions))
 
-
-def test():
-    return LabelFile('./data/t10k-labels-idx1-ubyte')
-
 def usage():
     print(sys.argv[0] + ' train/read/test')
 
